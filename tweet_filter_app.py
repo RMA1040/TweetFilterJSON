@@ -271,3 +271,12 @@ if uploaded_file is not None:
             st.warning("Geen tweets gevonden in het JSON-bestand.")
     except Exception as e:
         st.exception(f"Fout bij verwerken van JSON-bestand: {e}")
+st.markdown(
+    """
+    <footer style="text-align:center; margin-top:50px;">
+        <hr>
+        <p>Raymond Maetha <a href="https://www.linkedin.com/in/raymond-maetha-5901b3203/" target="_blank">LinkedIn</a></p>
+    </footer>
+    """,
+    unsafe_allow_html=True
+)
