@@ -31,31 +31,20 @@ with st.sidebar:
         st.session_state["logged_in"] = False
 
 def evaluate_search_query(text, query):
-    def escape_word(w):
-        return f'"{w.lower()}" in text_lower'
-
-    tokens = re.findall(r'\"(.*?)\"|\bAND\b|\bOR\b|\(|\)', query)
-    if not tokens:
-        return True
-
-    logic = []
-    for token in tokens:
-        if token == 'AND':
-            logic.append('and')
-        elif token == 'OR':
-            logic.append('or')
-        elif token == '(' or token == ')':
-            logic.append(token)
-        elif token:
-            logic.append(escape_word(token))
-
-    final_expr = ' '.join(logic)
+    """
+    Vereenvoudigde veilige parser voor AND/OR tussen woorden of zinnen.
+    Ondersteunt: AND, OR, haakjes en zinnen met aanhalingstekens.
+    """
     text_lower = text.lower()
-    try:
-        return eval(final_expr)
-    except Exception as e:
-        print(f"Evaluatiefout: {e}")
-        return False
+
+    # 1. Split per OR
+    or_parts = [part.strip() for part in re.split(r'\bOR\b', query, flags=re.IGNORECASE)]
+    for or_part in or_parts:
+        # 2. Binnen elk OR-gedeelte: alles moet matchen (AND)
+        and_parts = [p.strip().strip('"') for p in re.split(r'\bAND\b', or_part, flags=re.IGNORECASE)]
+        if all(term.lower() in text_lower for term in and_parts):
+            return True
+    return False
 
 def filter_tweets(tweets, min_words=0, max_words=None, required_keywords=None, use_or=False,
                   filter_metric=None, min_metric_value=0, search_query="",
